@@ -13,7 +13,6 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "netlify deploy --prod"
   },
-  "type": "module",
   "author": "",
   "license": "ISC",
   "description": ""
