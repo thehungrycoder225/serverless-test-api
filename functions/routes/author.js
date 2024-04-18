@@ -22,14 +22,18 @@ router.get('/:id', getAuthor, (req, res) => {
 router.post('/', async (req, res) => {
   try {
     // Validate request body
-    if (!req.body.name || !req.body.age) {
+    if (!req.body.email || !req.body.name || !req.body.age) {
       return res.status(400).json({ message: 'Name and age are required' });
+    } else if (!req.body.email.includes('@')) {
+      return res.status(400).json({ message: 'Invalid email' });
     }
 
     // Check if the author's name already exists
-    const existingAuthor = await AuthorModel.findOne({ name: req.body.name });
+    const existingAuthor = await AuthorModel.findOne({ email: req.body.email });
     if (existingAuthor) {
-      return res.status(400).json({ message: 'Author already exists' });
+      return res
+        .status(400)
+        .json({ message: 'Email is already associated with another account' });
     }
 
     const author = new AuthorModel(req.body);
