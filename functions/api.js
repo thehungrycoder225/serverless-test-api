@@ -1,8 +1,13 @@
 const express = require('express');
 const serverless = require('serverless-http');
-import router from './routes/author.js';
+const router = require('./routes/author');
+const mongoose = require('mongoose');
+const cors = require('cors');
 
 const app = express();
+app.use(cors());
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 mongoose
   .connect(
