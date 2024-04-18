@@ -1,5 +1,5 @@
-import express from 'express';
-import AuthorModel from '../models/author.js';
+const express = require('express');
+const AuthorModel = require('../models/author');
 
 const router = express.Router();
 

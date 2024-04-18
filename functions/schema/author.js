@@ -1,4 +1,5 @@
-import { Schema } from 'mongoose';
+const mongoose = require('mongoose');
+const { Schema } = mongoose;
 
 const authorSchema = new Schema({
   name: {
