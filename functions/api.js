@@ -1,9 +1,11 @@
 const express = require('express');
 const serverless = require('serverless-http');
-const router = require('./routes/author');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const dotenv = require('dotenv');
+const authors = require('./routes/author');
+const users = require('./routes/user');
+const auth = require('./routes/auth');
 
 dotenv.config();
 const app = express();
@@ -20,7 +22,9 @@ mongoose
   .catch((error) => console.error('Failed to connect to MongoDB', error));
 
 // app.use('/.netlify/functions/api', router);
-app.use('/api', router);
+app.use('/api/authors', authors);
+app.use('/api/users', users);
+app.use('/api/auth', auth);
 
 const port = process.env.PORT || 3000;
 app.listen(port, () =>

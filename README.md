@@ -16,7 +16,7 @@ To get started with this repository, follow these steps:
 1. Clone the repository: `git clone https://github.com/your-username/your-repo.git`
 2. Install the dependencies: `npm install`
 3. Configure the authentication and authorization settings according to your requirements.
-4. Start the server: `npm start`
+4. Start the server: `npm run dev`
 
 ## Usage
 
