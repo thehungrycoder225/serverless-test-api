@@ -27,18 +27,6 @@ const userSchema = new Schema({
     type: Boolean,
     default: false,
   },
-  // roles: [
-  //   {
-  //     type: String,
-  //     enum: ['admin', 'user'],
-  //   },
-  // ],
-  // operations: [
-  //   {
-  //     type: String,
-  //     enum: ['create', 'read', 'update', 'delete'],
-  //   },
-  // ],
 });
 
 userSchema.methods.generateAuthToken = function () {

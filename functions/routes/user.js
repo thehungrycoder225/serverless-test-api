@@ -8,45 +8,53 @@ const auth = require('../middleware/auth');
 const admin = require('../middleware/admin');
 
 router.post('/', async (req, res) => {
-  const { error } = validateUser(req.body);
-  if (error) {
-    return res.status(400).send(error.details[0].message);
+  try {
+    const { error } = validateUser(req.body);
+    if (error)
+      return res.status(400).send({
+        status: 'error',
+        error: error.details[0].message,
+      });
+
+    const existingUser = await User.findOne({ email: req.body.email });
+    if (existingUser)
+      return res.status(400).send({
+        status: 'error',
+        error: 'Email is Already In Use',
+      });
+
+    const { name, email, password } = req.body;
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+    const user = new User({ name, email, password: hashedPassword });
+    await user.save();
+
+    const token = user.generateAuthToken();
+    res
+      .status(200)
+      .header('x-auth-token', token)
+      .send({
+        status: 'success',
+        message: 'User registered successfully',
+        user: _.pick(user, ['_id', 'name', 'email']),
+      });
+  } catch (error) {
+    res.status(500).json({ message: 'An error occurred' });
   }
-
-  const existingUser = await User.findOne({ email: req.body.email });
-  if (existingUser) {
-    return res.status(400).send('User already registered.');
-  }
-
-  const { name, email, password } = req.body;
-  const salt = await bcrypt.genSalt(10);
-  const hashedPassword = await bcrypt.hash(password, salt);
-
-  const user = new User({
-    name,
-    email,
-    password: hashedPassword,
-  });
-
-  await user.save();
-  const token = user.generateAuthToken();
-  res
-    .header('x-auth-token', token)
-    .send(_.pick(user, ['_id', 'name', 'email']));
 });
 
-router.get('/', [auth, admin], async (req, res) => {
-  const users = await User.find().sort('name').select('-password');
+router.get('/', auth, async (req, res) => {
+  const users = await User.find().sort('name');
   res.send(users);
 });
 
-router.get('/me', auth, async (req, res) => {
+router.get('/me', async (req, res) => {
   const user = await User.findById(req.user._id).select('-password');
   res.send(user);
 });
 
 router.delete('/:id', async (req, res) => {
-  const user = await User.findByIdAndRemove(req.params.id);
+  const user = await User.findByIdAndDelete(req.params.id);
   if (!user) {
     return res.status(404).send('The user with the given ID was not found.');
   }
