@@ -6,6 +6,9 @@ const dotenv = require('dotenv');
 const authors = require('./routes/author');
 const users = require('./routes/user');
 const auth = require('./routes/auth');
+const generateKey = require('./middleware/generateKey');
+const sign = require('./middleware/sign');
+const verify = require('./middleware/verify');
 
 dotenv.config();
 const app = express();
@@ -21,10 +24,9 @@ mongoose
   .then(() => console.log('Connected to MongoDB'))
   .catch((error) => console.error('Failed to connect to MongoDB', error));
 
-// app.use('/.netlify/functions/api', router);
-app.use('/api/authors', authors);
-app.use('/api/users', users);
-app.use('/api/auth', auth);
+app.use('/.netlify/functions/api/authors', authors);
+app.use('/.netlify/functions/api/users', users);
+app.use('/.netlify/functions/api/auth', auth);
 
 const port = process.env.PORT || 3000;
 app.listen(port, () =>

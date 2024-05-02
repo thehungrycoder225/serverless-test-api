@@ -7,7 +7,7 @@ const validateUser = require('../models/user').validate;
 const auth = require('../middleware/auth');
 const admin = require('../middleware/admin');
 
-router.post('/', async (req, res) => {
+router.post('/', auth, admin, async (req, res) => {
   try {
     const { error } = validateUser(req.body);
     if (error)
@@ -43,7 +43,7 @@ router.post('/', async (req, res) => {
   }
 });
 
-router.get('/', auth, async (req, res) => {
+router.get('/', auth, admin, async (req, res) => {
   const users = await User.find().sort('name');
   res.send(users);
 });
@@ -53,7 +53,7 @@ router.get('/me', async (req, res) => {
   res.send(user);
 });
 
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', auth, admin, async (req, res) => {
   const user = await User.findByIdAndDelete(req.params.id);
   if (!user) {
     return res.status(404).send('The user with the given ID was not found.');

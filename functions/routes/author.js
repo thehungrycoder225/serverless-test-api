@@ -1,10 +1,13 @@
 const express = require('express');
 const AuthorModel = require('../models/author');
+const validateAuthor = require('../models/author');
+const auth = require('../middleware/auth');
+const admin = require('../middleware/admin');
 
 const router = express.Router();
 
 // GET all authors
-router.get('/', async (req, res) => {
+router.get('/', auth, admin, async (req, res) => {
   try {
     const authors = await AuthorModel.find();
     res.json(authors);
@@ -14,40 +17,34 @@ router.get('/', async (req, res) => {
 });
 
 // GET a single author
-router.get('/:id', getAuthor, (req, res) => {
+router.get('/:id', auth, admin, getAuthor, (req, res) => {
   res.json(res.author);
 });
 
 // CREATE an author
 router.post('/', async (req, res) => {
   try {
-    // Validate request body
-    if (!req.body.email || !req.body.name || !req.body.age) {
-      return res.status(400).json({ message: 'Name and age are required' });
-    } else if (!req.body.email.includes('@')) {
-      return res.status(400).json({ message: 'Invalid email' });
+    const { error } = validateAuthor(req.body);
+    if (error) {
+      return res.status(400).json({
+        status: 'error',
+        message: error.details[0].message,
+      });
     }
-
-    // Check if the author's name already exists
-    const existingAuthor = await AuthorModel.findOne({ email: req.body.email });
-    if (existingAuthor) {
-      return res
-        .status(400)
-        .json({ message: 'Email is already associated with another account' });
-    }
-
-    const author = new AuthorModel(req.body);
+    const author = new AuthorModel({
+      name: req.body.name,
+      email: req.body.email,
+      age: req.body.age,
+    });
     const newAuthor = await author.save();
-    res
-      .status(201)
-      .json({ message: 'Author created successfully', author: newAuthor });
+    res.status(201).json(newAuthor);
   } catch (err) {
     res.status(400).json({ message: err.message });
   }
 });
 
 // UPDATE an author
-router.patch('/:id', getAuthor, async (req, res) => {
+router.patch('/:id', auth, admin, getAuthor, async (req, res) => {
   try {
     if (req.body.name != null) {
       res.author.name = req.body.name;
@@ -73,10 +70,20 @@ router.put('/:id', getAuthor, async (req, res) => {
 });
 
 // DELETE an author
-router.delete('/:id', getAuthor, async (req, res) => {
+router.delete('/:id', auth, admin, getAuthor, async (req, res) => {
   try {
     await AuthorModel.findByIdAndDelete(req.params.id);
     res.json({ message: 'Author deleted' });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+// Delete All Authors
+router.delete('/', auth, admin, async (req, res) => {
+  try {
+    await AuthorModel.deleteMany();
+    res.json({ message: 'All authors deleted' });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
