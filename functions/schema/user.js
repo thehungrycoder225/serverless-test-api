@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 // const config = require('config');
-const jwtPrivateKey = secret;
+const jwtPrivateKey = 'secret';
 const jwt = require('jsonwebtoken');
 
 const userSchema = new Schema({
