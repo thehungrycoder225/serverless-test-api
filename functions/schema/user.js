@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
-const config = require('config');
+// const config = require('config');
+const jwtPrivateKey = secret;
 const jwt = require('jsonwebtoken');
 
 const userSchema = new Schema({
@@ -29,11 +30,14 @@ const userSchema = new Schema({
   },
 });
 
-userSchema.methods.generateAuthToken = function () {
-  return jwt.sign(
-    { _id: this._id, isAdmin: this.isAdmin },
-    config.get('jwtPrivateKey')
-  );
-};
+// userSchema.methods.generateAuthToken = function () {
+//   return jwt.sign(
+//     { _id: this._id, isAdmin: this.isAdmin },
+//     config.get('jwtPrivateKey')
+//   );
+// };
 
+userSchema.methods.generateAuthToken = function () {
+  return jwt.sign({ _id: this._id, isAdmin: this.isAdmin }, jwtPrivateKey);
+};
 module.exports = userSchema;

@@ -10,7 +10,7 @@ const generateKey = require('./middleware/generateKey');
 const sign = require('./middleware/sign');
 const verify = require('./middleware/verify');
 
-dotenv.config();
+// dotenv.config();
 const app = express();
 const dbLocalUrl = 'mongodb://localhost:27017/express-mongo-api';
 

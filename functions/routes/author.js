@@ -3,7 +3,6 @@ const AuthorModel = require('../models/author');
 const validateAuthor = require('../models/author');
 const auth = require('../middleware/auth');
 const admin = require('../middleware/admin');
-
 const router = express.Router();
 
 // GET all authors
